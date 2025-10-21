@@ -1,9 +1,11 @@
 # main.py
 # pip install fpdf2 PySimpleGUI
+# importar librerías
 import json, os, sys, datetime, subprocess
 import PySimpleGUI as sg
 from pdf_gen import create_ticket_pdf
 
+# -------- importar módulo de email (opcional) --------
 # correo opcional
 MAIL_AVAILABLE = True
 try:
@@ -11,7 +13,9 @@ try:
 except Exception:
     MAIL_AVAILABLE = False
 
+
 # -------- utilidades --------
+#leer el archivo config.json donde está la infomarcion de la empresa
 def load_store_config(path="config.json"):
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -20,6 +24,7 @@ def load_store_config(path="config.json"):
         raise ValueError("Falta sección 'store' en config.json")
     return store, data
 
+#abre el archivo pdf después de crearlo
 def open_file(path):
     try:
         if os.name == "nt":
@@ -31,12 +36,14 @@ def open_file(path):
     except Exception:
         pass
 
+# convierte un texto a número (float)
 def to_float(s, default=0.0):
     try:
         return float(str(s).replace(",", "."))
     except:
         return default
 
+# calcula subtotal, iva y total de los productos
 def calc_totals(items, iva_rate=0.13, prices_include_iva=False):
     gross = sum(it["qty"] * it["price"] for it in items)
     if prices_include_iva:
@@ -49,6 +56,7 @@ def calc_totals(items, iva_rate=0.13, prices_include_iva=False):
         total = subtotal + iva
     return round(subtotal,2), round(iva,2), round(total,2)
 
+# devuelve la fecha y hora actual
 def now_date_time():
     now = datetime.datetime.now()
     return now.strftime("%Y-%m-%d"), now.strftime("%H:%M")
@@ -65,12 +73,15 @@ except Exception as e:
 sg.theme("SystemDefault")
 
 # ========= Estado de productos en memoria (sin BD) =========
+# aquí se guardan los productos agregados
 items = []  # cada item: {"name": str, "qty": float, "price": float}
 
+# actualiza la tabla visual
 def refresh_items_table():
     table_vals = [[i+1, it["name"], f"{it['qty']:.2f}", f"{it['price']:.2f}", f"{it['qty']*it['price']:.2f}"] for i,it in enumerate(items)]
     win["-TABLE-"].update(values=table_vals)
 
+# actualiza los totales (subtotal, iva, total)
 def refresh_totals():
     subtotal, iva, total = calc_totals(items, IVA_RATE, PRICES_INCLUDE_IVA)
     win["-SUB-"].update(f"Subtotal: ${subtotal:.2f}")
@@ -85,6 +96,7 @@ header_frame = sg.Frame(
      [sg.Text(STORE["address"])]],
 )
 
+# parte izquierda: datos del cliente
 left = [
     [sg.Text("Cliente"),   sg.Input("", key="-CLIENTE-", size=(35,1))],
     [sg.Text("Documento"), sg.Input("", key="-DOC-", size=(20,1))],
@@ -95,6 +107,7 @@ left = [
      sg.Input("", key="-EMAIL-", size=(28,1), disabled=True, tooltip="correo@cliente.com")],
 ]
 
+# parte derecha: productos
 right_items = [
     [sg.Text("Agregar producto")],
     [sg.Text("Nombre", size=(8,1)), sg.Input("", key="-P_NAME-", size=(28,1))],
@@ -112,6 +125,7 @@ right_items = [
      sg.Text("   Total: $0.00", key="-TOT-")],
 ]
 
+# todo junto
 layout = [
     [header_frame],
     [sg.Column(left, vertical_alignment="top"), sg.VSeparator(), sg.Column(right_items, vertical_alignment="top")],
@@ -134,17 +148,20 @@ refresh_items_table()
 refresh_totals()
 
 # ========= Loop =========
+
 while True:
     ev, val = win.read()
     if ev in (sg.WINDOW_CLOSED, "Salir"):
         break
-
+  # activar campo correo si se marca la casilla
     if ev == "-SENDMAIL-":
         toggle_email_field(val["-SENDMAIL-"])
 
+    # mostrar campo de efectivo si se elige ese método
     if ev == "-PAY-":
         toggle_cash_field(val["-PAY-"])
-
+        
+    # agregar producto
     if ev == "-ADD-":
         try:
             name = (val["-P_NAME-"] or "").strip()
@@ -164,6 +181,7 @@ while True:
         except Exception as e:
             sg.popup_error(f"Error al agregar: {e}")
 
+    # editar producto seleccionado
     if ev == "-EDIT-":
         sel = val["-TABLE-"]
         if not sel:
@@ -183,6 +201,7 @@ while True:
         except Exception as e:
             sg.popup_error(f"Error al editar: {e}")
 
+    # eliminar producto seleccionado
     if ev == "-DEL-":
         sel = val["-TABLE-"]
         if not sel:
@@ -195,6 +214,7 @@ while True:
             refresh_totals()
         except Exception as e:
             sg.popup_error(f"Error al eliminar: {e}")
+
 
     if ev == "-TABLE-":
         # al seleccionar, carga los valores al formulario de producto (para editar cómodo)

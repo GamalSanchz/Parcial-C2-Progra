@@ -6,10 +6,11 @@
     "iva_rate": 0.13,
     "prices_include_iva": false
   },
-  "smtp": {
-    "host": "pcsolutions584@.com",
-    "port": 465,
-    "user": "pcsolutions584@.com",
-    "password": "12345"
-  }
+"smtp": {
+  "host": "smtp.gmail.com",
+  "port": 587,
+  "user": "pcsolutions584@gmail.com",
+  "password": "rjch qivp dsfj vmop",
+  "verify_ssl": false
+}
 }

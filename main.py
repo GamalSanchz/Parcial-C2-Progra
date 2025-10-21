@@ -234,9 +234,8 @@ while True:
                 save_as=True,
                 default_extension=".pdf",
                 file_types=(("PDF","*.pdf"),),
-                default_path=default_name  # ← corrección: antes decía initial_file
+                default_path=default_name
             )
-
             if not save_path:
                 continue
 
@@ -270,11 +269,16 @@ while True:
                         cfg = load_mail_config("config.json")
                         subject = f"Comprobante de compra - {STORE['name']}"
                         body = "Adjunto su comprobante de compra. ¡Gracias!"
-                        send_mail(to, subject, body, save_path, cfg)
+                        send_mail(to, subject, body, save_path, cfg, use_starttls=True)
                         sg.popup("Correo enviado.")
 
-            if sg.popup_yes_no(f"PDF generado:\n{save_path}\n\n¿Abrir ahora?",
-                               yes_text="Abrir", no_text="Cerrar") == "Yes":
+            # Abrir PDF: usar popup con custom_text (sí/no en español)
+            resp = sg.popup(
+                f"PDF generado:\n{save_path}\n\n¿Abrir ahora?",
+                title="Abrir PDF",
+                custom_text=("Abrir", "Cerrar")
+            )
+            if resp == "Abrir":
                 open_file(save_path)
 
         except Exception as e:

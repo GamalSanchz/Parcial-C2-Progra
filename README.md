@@ -3,11 +3,11 @@ Parcial del Cómputo 2 de programación computacional 3
 
 Integrantes:
 Diego Maximiliano Aviles Gómez.
-Codigo: SMTR042724
+Codigo: SMTR042724.
 Francisco Javier Hernández Aguirre.
-Codigo: SMSS068924
+Codigo: SMSS068924.
 Brandom Gamaliel Sánchez Guevara.
-Codigo:
+Codigo:SMSS.
 
 Descripción del repositorio:
 programa en Python para hacer tickets o facturas en PDF usando FPDF que fue la que elegimos como base principal. La idea era generar tickets o facturas en PDF con formato tipo térmico, como los que salen en impresoras de 80 mm. Todo lo demás (interfaz, envío por correo, etc.) se agregó como complemento para que fuera más útil y presentable

@@ -1,0 +1,9 @@
+Se necesita tener Python instalado.
+
+Instalar la librería fpdf2, que se usa para generar el PDF del ticket: pip install fpdf2
+
+Instalar la librería PySimpleGUI, que sirve para mostrar la interfaz gráfica: pip install PySimpleGUI
+
+No hace falta instalar otras librerías como json, smtplib, ssl, email o subprocess, porque ya vienen incluidas con Python.
+
+Con instalar Fpdf2 y PysimpleGui es mas que suficiente para que el programa funcione debido a que ya estan configuradas las otras funciones del programa.
